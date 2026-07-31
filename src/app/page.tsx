@@ -20,10 +20,6 @@ export default function Home() {
   const scrollSpacerRef = useRef<HTMLDivElement>(null);
   const heroTextRef = useRef<HTMLDivElement>(null);
   const bentoGridRef = useRef<HTMLDivElement>(null);
-  
-  // Refs per Kinetic Scrub Text
-  const word1Ref = useRef<HTMLDivElement>(null);
-  const word2Ref = useRef<HTMLDivElement>(null);
 
   // Canvas Image Sequence (Frozen Background)
   useEffect(() => {
@@ -93,29 +89,7 @@ export default function Home() {
         0
       );
 
-      // 3. Kinetic Text 1: "SCALABILITÀ" (10% -> 40%)
-      if (word1Ref.current) {
-        const text1 = new SplitType(word1Ref.current, { types: "chars" });
-        scrubTl.set(word1Ref.current, { opacity: 1 }, 0.1); 
-        scrubTl.fromTo(text1.chars,
-          { opacity: 0, scale: 3, filter: "blur(20px)" },
-          { opacity: 1, scale: 1, filter: "blur(0px)", stagger: 0.005, duration: 0.05, ease: "power3.out" },
-          0.1
-        ).to(word1Ref.current, { opacity: 0, y: -100, duration: 0.05 }, 0.35);
-      }
-
-      // 4. Kinetic Text 2: "PERFORMANCE" (45% -> 75%)
-      if (word2Ref.current) {
-        const text2 = new SplitType(word2Ref.current, { types: "chars" });
-        scrubTl.set(word2Ref.current, { opacity: 1 }, 0.45); 
-        scrubTl.fromTo(text2.chars,
-          { opacity: 0, scale: 3, filter: "blur(20px)" },
-          { opacity: 1, scale: 1, filter: "blur(0px)", stagger: 0.005, duration: 0.05, ease: "power3.out" },
-          0.45
-        ).to(word2Ref.current, { opacity: 0, y: -100, duration: 0.05 }, 0.7);
-      }
-
-      // 5. Glass Transition Overlay (80% -> 100%)
+      // 3. Glass Transition Overlay (80% -> 100%)
       scrubTl.to(overlayRef.current, { opacity: 0.9, ease: "none", duration: 0.2 }, 0.8);
 
 
@@ -199,16 +173,6 @@ export default function Home() {
         {/* L'overlay che sfuma a nero durante lo scrub */}
         <div ref={overlayRef} className="absolute inset-0 bg-black opacity-40 mix-blend-multiply" />
         
-        {/* PAROLE CINETICHE DURANTE LO SCRUB */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div ref={word1Ref} className="absolute text-6xl md:text-[8vw] font-bold tracking-tighter text-white font-pixel opacity-0">
-            SCALABILITÀ
-          </div>
-          <div ref={word2Ref} className="absolute text-6xl md:text-[8vw] font-bold tracking-tighter text-[#8c52ff] font-pixel opacity-0">
-            PERFORMANCE
-          </div>
-        </div>
-
         {/* Gradiente nero sul fondo per sfumare dolcemente verso il basso */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
       </div>
