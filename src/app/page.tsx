@@ -288,9 +288,9 @@ export default function Home() {
 
             <div ref={bentoGridRef} className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 auto-rows-[350px]">
               {/* Bento Box 1: AI */}
-              <GlowCard className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
+              <GlowCard className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-3xl border border-white/20 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
                 <div className="flex justify-between items-start">
-                  <div className="border border-[#8c52ff]/30 text-[#8c52ff] px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono bg-[#8c52ff]/10">
+                  <div className="border border-[#8c52ff]/50 text-[#8c52ff] px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono bg-[#8c52ff]/10 font-semibold">
                     01 / Artificial Intelligence
                   </div>
                   {/* LOGO VOLTA STUDIO ANIMATO */}
@@ -299,36 +299,36 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="relative z-10">
-                  <h3 className="text-5xl lg:text-6xl tracking-tight mb-6">Integrazione LLM<br/>& Agenti</h3>
-                  <p className="text-white/60 text-xl max-w-md">
+                  <h3 className="text-5xl lg:text-6xl tracking-tight mb-6 text-white drop-shadow-md">Integrazione LLM<br/>& Agenti</h3>
+                  <p className="text-white/90 text-xl max-w-md drop-shadow-sm font-medium">
                     Sviluppiamo soluzioni AI proprietarie, da agenti conversazionali a sistemi RAG avanzati integrati direttamente nella tua infrastruttura aziendale.
                   </p>
                 </div>
               </GlowCard>
 
               {/* Bento Box 2: Engineering */}
-              <GlowCard className="col-span-1 md:col-span-1 lg:col-span-2 row-span-1 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
+              <GlowCard className="col-span-1 md:col-span-1 lg:col-span-2 row-span-1 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-3xl border border-white/20 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
                 <div className="flex justify-between items-start">
-                  <div className="border border-white/20 group-hover:border-[#8c52ff]/30 group-hover:text-[#8c52ff] px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono transition-colors">
+                  <div className="border border-white/40 group-hover:border-[#8c52ff]/60 group-hover:text-[#8c52ff] px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono transition-colors font-semibold">
                     02 / Web Engineering
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-3xl lg:text-4xl tracking-tight mb-3">Performance Assolute</h3>
-                  <p className="text-white/60 text-lg">Architetture Next.js server-first, Edge computing e ottimizzazione Core Web Vitals al millisecondo.</p>
+                  <h3 className="text-3xl lg:text-4xl tracking-tight mb-3 text-white drop-shadow-md">Performance Assolute</h3>
+                  <p className="text-white/90 text-lg drop-shadow-sm font-medium">Architetture Next.js server-first, Edge computing e ottimizzazione Core Web Vitals al millisecondo.</p>
                 </div>
               </GlowCard>
 
               {/* Bento Box 3: Design */}
-              <GlowCard className="col-span-1 md:col-span-3 lg:col-span-2 row-span-1 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
+              <GlowCard className="col-span-1 md:col-span-3 lg:col-span-2 row-span-1 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-3xl border border-white/20 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
                 <div className="flex justify-between items-start">
-                  <div className="border border-white/20 group-hover:border-[#8c52ff]/30 group-hover:text-[#8c52ff] px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono transition-colors">
+                  <div className="border border-white/40 group-hover:border-[#8c52ff]/60 group-hover:text-[#8c52ff] px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono transition-colors font-semibold">
                     03 / Pixel Perfect Design
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-3xl lg:text-4xl tracking-tight mb-3 font-pixel">Estetica & Funzione</h3>
-                  <p className="text-white/60 text-lg">Nessuna scorciatoia. Disegniamo interfacce customizzate che fondono le migliori pratiche UX con layout Awwwards-winning.</p>
+                  <h3 className="text-3xl lg:text-4xl tracking-tight mb-3 font-pixel text-white drop-shadow-md">Estetica & Funzione</h3>
+                  <p className="text-white/90 text-lg drop-shadow-sm font-medium">Nessuna scorciatoia. Disegniamo interfacce customizzate che fondono le migliori pratiche UX con layout Awwwards-winning.</p>
                 </div>
               </GlowCard>
             </div>
@@ -338,7 +338,7 @@ export default function Home() {
         {/* 3. STICKY STACK - TECH ARSENAL (Sostituisce Horizontal Pan) */}
         <section className="py-48 px-6 md:px-14">
           <div className="max-w-[1200px] mx-auto flex flex-col items-center">
-            <h2 className="text-6xl md:text-8xl tracking-tighter leading-none mb-32 text-center">
+            <h2 className="text-6xl md:text-8xl tracking-tighter leading-none mb-32 text-center drop-shadow-xl">
               LE NOSTRE<br />
               <span className="font-pixel text-[1.2em] bg-clip-text text-transparent bg-gradient-to-br from-[#8c52ff] to-[#5e17eb]">ARMI.</span>
             </h2>
@@ -352,11 +352,11 @@ export default function Home() {
               ].map((tech, i) => (
                 <div 
                   key={i} 
-                  className="sticky skew-element transform-gpu flex items-center justify-between bg-black/60 backdrop-blur-3xl border border-[#8c52ff]/20 rounded-3xl p-12 w-full h-[25vh] shadow-[0_0_50px_rgba(0,0,0,0.5)] transition-transform duration-500 hover:scale-[1.02]"
+                  className="sticky skew-element transform-gpu flex items-center justify-between bg-white/5 backdrop-blur-3xl border border-white/20 rounded-3xl p-12 w-full h-[25vh] shadow-[0_0_50px_rgba(140,82,255,0.1)] transition-all duration-500 hover:bg-white/10 hover:border-[#8c52ff]/50 hover:scale-[1.02]"
                   style={{ top: `calc(15vh + ${i * 40}px)`, zIndex: i + 10 }}
                 >
-                  <h3 className="text-4xl md:text-6xl tracking-tight font-medium text-white group-hover:text-[#8c52ff] transition-colors">{tech.title}</h3>
-                  <p className="text-white/50 text-xl max-w-sm text-right leading-relaxed">{tech.desc}</p>
+                  <h3 className="text-4xl md:text-6xl tracking-tight font-medium text-white group-hover:text-[#8c52ff] transition-colors drop-shadow-md">{tech.title}</h3>
+                  <p className="text-white/90 text-xl max-w-sm text-right leading-relaxed drop-shadow-sm font-medium">{tech.desc}</p>
                 </div>
               ))}
             </div>
