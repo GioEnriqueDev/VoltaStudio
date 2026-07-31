@@ -37,7 +37,7 @@ export default function Home() {
     canvas.height = 1080;
     const frameCount = 361;
     
-    const currentFrame = (index: number) => `/frames_hq/frame_${(index + 1).toString().padStart(4, "0")}.jpg`;
+    const currentFrame = (index: number) => `/frames_ultra/frame_${(index + 1).toString().padStart(4, "0")}.jpg`;
 
     const images: HTMLImageElement[] = [];
     for (let i = 0; i < frameCount; i++) {

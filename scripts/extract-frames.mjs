@@ -4,7 +4,7 @@ import ffmpeg from 'fluent-ffmpeg';
 import ffmpegStatic from 'ffmpeg-static';
 
 const VIDEO_PATH = path.join(process.cwd(), 'public', 'video.mp4');
-const OUTPUT_DIR = path.join(process.cwd(), 'public', 'frames_hq');
+const OUTPUT_DIR = path.join(process.cwd(), 'public', 'frames_ultra');
 
 // Ensure output directory exists
 if (!fs.existsSync(OUTPUT_DIR)) {
@@ -24,7 +24,7 @@ console.log('Extracting frames as JPG...');
 
 ffmpeg(VIDEO_PATH)
   .outputOptions([
-    '-vf scale=1920:-1', 
+    '-vf scale=1920:-1,hqdn3d=4:4:5:5,unsharp=3:3:1.2:3:3:0.0', 
     '-r 30',             
     '-q:v 2', // Massima qualità (1-31, più basso è meglio)
   ])
