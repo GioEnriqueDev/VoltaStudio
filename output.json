@@ -1,0 +1,14 @@
+{
+  "created_at": "2026-07-31T22:53:39.049507Z",
+  "error": null,
+  "id": "0b226w6sw6z0nv1hebpj35m63z",
+  "output": {
+    "actual_prompt": null,
+    "seed": 1095720132,
+    "video": "https://cloud.inference.sh/app/files/t/6b794bsn/tq5dzo0b.mp4"
+  },
+  "session_id": null,
+  "status": 10,
+  "status_text": "completed",
+  "updated_at": "2026-07-31T22:53:39.066293Z"
+}

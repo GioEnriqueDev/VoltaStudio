@@ -31,7 +31,7 @@ export default function Home() {
 
     canvas.width = 1920;
     canvas.height = 1080;
-    const frameCount = 361;
+    const frameCount = 151;
     
     const currentFrame = (index: number) => `/frames_ultra/frame_${(index + 1).toString().padStart(4, "0")}.jpg`;
 
