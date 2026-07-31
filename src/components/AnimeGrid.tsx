@@ -12,7 +12,7 @@ export default function AnimeGrid() {
     const rows = 15;
     const cols = 25;
     const spacing = 60;
-    const lines: JSX.Element[] = [];
+    const lines: React.ReactNode[] = [];
 
     // Horizontal lines
     for (let i = 0; i <= rows; i++) {
