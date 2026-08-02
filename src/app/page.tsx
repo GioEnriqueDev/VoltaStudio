@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Play, Menu, X, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import gsap from "gsap";
+import FloatingLines from "../components/FloatingLines";
 import DecryptedText from "../components/DecryptedText";
 import Logo from "../components/Logo";
 import { GlowCard } from "../components/GlowCard";
@@ -13,145 +14,95 @@ import SplitType from "split-type";
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const overlayRef = useRef<HTMLDivElement>(null);
-  
-  // Refs per l'architettura fissa e scroll
   const scrollSpacerRef = useRef<HTMLDivElement>(null);
   const heroTextRef = useRef<HTMLDivElement>(null);
   const bentoGridRef = useRef<HTMLDivElement>(null);
 
-  // Canvas Image Sequence (Frozen Background)
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !scrollSpacerRef.current || !heroTextRef.current) return;
-
-    const context = canvas.getContext("2d");
-    if (!context) return;
-
-    canvas.width = 1920;
-    canvas.height = 1080;
-    const frameCount = 151;
-    
-    const currentFrame = (index: number) => `/frames_ultra/frame_${(index + 1).toString().padStart(4, "0")}.jpg`;
-
-    const images: HTMLImageElement[] = [];
-    for (let i = 0; i < frameCount; i++) {
-      const img = new Image();
-      img.src = currentFrame(i);
-      images.push(img);
-    }
-
-    images[0].onload = () => {
-      context.drawImage(images[0], 0, 0, canvas.width, canvas.height);
-    };
-
-    const frames = { frame: 0 };
+    if (!scrollSpacerRef.current || !heroTextRef.current) return;
 
     import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
       gsap.registerPlugin(ScrollTrigger);
 
-      // Master Timeline per lo Scrub Spacer
-      const scrubTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: scrollSpacerRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: 0.2, // Ultra reattivo
-        }
-      });
-
-      // 1. Hero Text Fade Out (Rapido, 0-15%)
-      scrubTl.to(heroTextRef.current, {
-        opacity: 0,
-        y: -150,
-        scale: 0.9,
-        ease: "power2.in",
-      }, 0);
-
-      // 2. Canvas Scrubbing & Deep Zoom (0-100%)
-      scrubTl.to(frames, {
-        frame: frameCount - 1,
-        snap: "frame",
-        ease: "none",
-        duration: 1, // Durata base 1 per calcolare bene le frazioni
-        onUpdate: () => {
-          const img = images[frames.frame];
-          if (img && img.complete) {
-            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+      let mm = gsap.matchMedia();
+      
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        // Master Timeline per lo Scrub Spacer
+        const scrubTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: scrollSpacerRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: 0.2, // Ultra reattivo
           }
+        });
+
+        // 1. Hero Text Fade Out
+        scrubTl.to(heroTextRef.current, {
+          opacity: 0,
+          y: -150,
+          scale: 0.9,
+          ease: "power2.in",
+        }, 0);
+
+        // Animazione a cascata Bento Grid
+        if (bentoGridRef.current) {
+          gsap.fromTo(bentoGridRef.current.children,
+            { opacity: 0, y: 100, scale: 0.9 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 1,
+              stagger: 0.1,
+              ease: "power4.out",
+              scrollTrigger: {
+                trigger: bentoGridRef.current,
+                start: "top 80%",
+              }
+            }
+          );
         }
-      }, 0);
 
-      scrubTl.fromTo(canvas, 
-        { scale: 1 }, 
-        { scale: 1.15, ease: "none", duration: 1 }, 
-        0
-      );
+        // --- KINETIC TYPOGRAPHY (Split-Type Reveal) ---
+        const titleElement = document.querySelector(".split-reveal");
+        if (titleElement) {
+          const text = new SplitType(titleElement as HTMLElement, { types: "chars" });
+          gsap.fromTo(
+            text.chars,
+            { opacity: 0, y: 100, rotateX: -90 },
+            {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              duration: 1.2,
+              stagger: 0.02,
+              ease: "power4.out",
+              delay: 0.5,
+            }
+          );
+        }
 
-      // 3. Glass Transition Overlay (80% -> 100%)
-      scrubTl.to(overlayRef.current, { opacity: 0.9, ease: "none", duration: 0.2 }, 0.8);
-
-
-      // Animazione a cascata Bento Grid
-      if (bentoGridRef.current) {
-        gsap.fromTo(bentoGridRef.current.children,
-          { opacity: 0, y: 100, scale: 0.9 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 1,
-            stagger: 0.1,
-            ease: "power4.out",
-            scrollTrigger: {
-              trigger: bentoGridRef.current,
-              start: "top 80%",
+        // --- VELOCITY SKEW (Inerzia Fisica con ScrollTrigger) ---
+        let proxy = { skew: 0 };
+        const skewSetter = gsap.quickSetter(".skew-element", "skewY", "deg");
+        const clamp = gsap.utils.clamp(-5, 5); // Max 5 gradi per eleganza
+        
+        ScrollTrigger.create({
+          onUpdate: (self) => {
+            let skew = clamp(self.getVelocity() / -100);
+            if (Math.abs(skew) > Math.abs(proxy.skew)) {
+              proxy.skew = skew;
+              gsap.to(proxy, {
+                skew: 0, 
+                duration: 1.2, // Ritorno morbido come gelatina
+                ease: "elastic.out(1, 0.3)", 
+                overwrite: true, 
+                onUpdate: () => skewSetter(proxy.skew)
+              });
             }
           }
-        );
-      }
-
-      // --- KINETIC TYPOGRAPHY (Split-Type Reveal) ---
-      // Rimuoviamo l'animazione base che era su opacity: 0 / y: 100
-      // e la facciamo carattere per carattere
-      const titleElement = document.querySelector(".split-reveal");
-      if (titleElement) {
-        const text = new SplitType(titleElement as HTMLElement, { types: "chars" });
-        gsap.fromTo(
-          text.chars,
-          { opacity: 0, y: 100, rotateX: -90 },
-          {
-            opacity: 1,
-            y: 0,
-            rotateX: 0,
-            duration: 1.2,
-            stagger: 0.02,
-            ease: "power4.out",
-            delay: 0.5,
-          }
-        );
-      }
-
-      // --- VELOCITY SKEW (Inerzia Fisica con ScrollTrigger) ---
-      let proxy = { skew: 0 };
-      const skewSetter = gsap.quickSetter(".skew-element", "skewY", "deg");
-      const clamp = gsap.utils.clamp(-5, 5); // Max 5 gradi per eleganza
-      
-      ScrollTrigger.create({
-        onUpdate: (self) => {
-          let skew = clamp(self.getVelocity() / -100);
-          if (Math.abs(skew) > Math.abs(proxy.skew)) {
-            proxy.skew = skew;
-            gsap.to(proxy, {
-              skew: 0, 
-              duration: 1.2, // Ritorno morbido come gelatina
-              ease: "elastic.out(1, 0.3)", 
-              overwrite: true, 
-              onUpdate: () => skewSetter(proxy.skew)
-            });
-          }
-        }
+        });
       });
       // ---------------------------------------------------------
       
@@ -163,100 +114,61 @@ export default function Home() {
   return (
     <main className="relative w-full bg-black text-white selection:bg-[#8c52ff] selection:text-white">
       
-      {/* FROZEN CANVAS BACKGROUND */}
-      {/* Rimane fisso sotto a tutto, creando continuità visiva */}
-      <div className="fixed inset-0 z-0 pointer-events-none bg-black flex items-center justify-center overflow-hidden">
-        <canvas
-          ref={canvasRef}
-          className="w-full h-full object-cover transform-gpu"
+      {/* FLOATING LINES BACKGROUND (Cinematic Dark+White) */}
+      <div className="fixed inset-0 z-0 pointer-events-auto bg-[#050505] overflow-hidden">
+        <FloatingLines
+          linesGradient={['#ffffff', '#8c52ff', '#333333']}
+          enabledWaves={['top', 'middle', 'bottom']}
+          lineCount={[10, 15, 20]}
+          lineDistance={[8, 6, 4]}
+          bendRadius={5.0}
+          bendStrength={-0.5}
+          interactive={true}
+          parallax={true}
+          mixBlendMode="screen"
         />
-        {/* L'overlay che sfuma a nero durante lo scrub */}
-        <div ref={overlayRef} className="absolute inset-0 bg-black opacity-40 mix-blend-multiply" />
-        
-        {/* Gradiente nero sul fondo per sfumare dolcemente verso il basso */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
+        {/* Gradiente nero sul fondo per sfumare dolcemente verso il basso ed enfatizzare il contrasto */}
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black via-black/40 to-transparent opacity-90" />
       </div>
 
       {/* HERO FOREGROUND TEXT (Fisso, sfuma via con lo scroll) */}
       <div className="fixed inset-0 z-10 pointer-events-none">
         <div ref={heroTextRef} className="flex h-full flex-col px-5 sm:px-6 md:px-10 lg:px-14">
-          <nav className="flex items-center justify-between py-6 pointer-events-auto">
+          <header className="flex items-center justify-between py-6 pointer-events-auto">
             <Logo />
-            <div className="hidden md:flex gap-8 text-sm tracking-wide">
+            <nav className="hidden md:flex gap-8 text-sm tracking-wide">
               {navLinks.map((link) => (
                 <Link key={link} href="#" className="hover:text-[#8c52ff] transition-colors uppercase font-medium">
                   {link}
                 </Link>
               ))}
-            </div>
+            </nav>
             <button className="md:hidden p-2 hover:text-[#8c52ff] transition-colors" onClick={() => setMenuOpen(true)}>
               <Menu size={24} />
             </button>
-          </nav>
+          </header>
 
-          <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 pointer-events-auto">
-            <div className="col-span-1">
-              <h2 className="text-lg md:text-xl tracking-wide leading-tight">
-                <div className="font-normal">VOLTA</div>
-                <div className="font-pixel text-2xl md:text-3xl">STUDIO</div>
-              </h2>
-              <div className="text-[10px] text-white/50 mt-3">*</div>
-              <div className="font-pixel mt-1 text-xs text-white/60 leading-relaxed whitespace-pre-line">
-                {`Volta Studio è\n  l'agenzia software\n  più avanzata\n  in Italia`}
-              </div>
-            </div>
-            <div className="col-span-1 text-right lg:text-left">
-              <h2 className="text-lg md:text-xl tracking-wide leading-tight">
-                <div className="font-normal">AI &</div>
-                <div className="font-pixel text-2xl md:text-3xl">ENGINEERING</div>
-              </h2>
-            </div>
-            <div className="col-span-1 mt-6 lg:mt-0">
-              <div className="text-base tracking-widest text-white/50 uppercase mb-3 font-pixel">Vision</div>
-              <p className="text-sm text-white/90 leading-relaxed max-w-[220px]">
-                Sviluppiamo le piattaforme digitali e i sistemi di intelligenza artificiale per il top 1% dei brand mondiali.
-              </p>
-            </div>
-            <div className="col-span-1 mt-6 lg:mt-0 text-right lg:text-left">
-              <div className="text-base tracking-widest text-white/50 uppercase mb-3 font-pixel">Core</div>
-              <ul className="text-sm text-white/90 leading-relaxed space-y-0.5">
-                <li>Machine Learning</li>
-                <li>Ingegneria Web Avanzata</li>
-                <li>Design Architetturale</li>
-                <li>UX/UI & WebGL</li>
-              </ul>
-            </div>
-          </div>
+          {/* Top text block rimosso: il Logo in header è sufficiente per un look premium e pulito */}          <div className="flex-1" />
 
-          <div className="flex-1" />
-
-          <div className="pb-4 pointer-events-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-end">
-              <div>
-                <h1 className="split-reveal text-[2.5rem] sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[5.5rem] tracking-tight uppercase font-medium whitespace-pre-line overflow-hidden" style={{ lineHeight: 0.85, perspective: "1000px" }}>
-                  <div className="inline-block">INGEGNERIA DIGITALE</div>{"\n"}
-                  <div className="inline-block"><span className="font-pixel font-normal text-[1.15em] inline-block leading-none align-baseline text-[#8c52ff]">MARKETING ESTREMO.</span></div>{"\n"}
-                  <div className="inline-block">RISULTATI REALI.</div>
+          <div className="pb-10 lg:pb-24 pointer-events-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-end">
+              <div className="lg:col-span-8">
+                <h1 className="split-reveal text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] tracking-tight uppercase font-medium overflow-hidden leading-[1.05]" style={{ perspective: "1000px" }}>
+                  <div className="block">INGEGNERIA DIGITALE.</div>
+                  <div className="block mt-2 mb-2"><span className="font-pixel font-normal text-[1.1em] text-[#8c52ff]">MARKETING ESTREMO.</span></div>
+                  <div className="block">RISULTATI REALI.</div>
                 </h1>
               </div>
-              <div className="flex flex-col gap-4 sm:gap-6 justify-end">
-                <p className="text-white/60 max-w-sm text-sm md:text-base leading-relaxed">
+              <div className="lg:col-span-4 flex flex-col gap-6 lg:pb-3">
+                <p className="text-white/70 max-w-sm text-sm md:text-base leading-relaxed font-light">
                   Uniamo sviluppo software full-stack, AI e performance marketing per scalare il tuo business oltre ogni limite tecnico.
                 </p>
                 <MagneticButton className="self-start">
-                  <div className="flex items-center gap-3 border border-[#8c52ff]/30 px-8 py-4 backdrop-blur-md bg-[#8c52ff]/10 hover:bg-[#8c52ff]/30 transition-all text-white group">
-                    <Play size={14} className="fill-white group-hover:fill-[#8c52ff] group-hover:text-[#8c52ff] transition-colors" />
-                    <span className="text-sm tracking-wider font-semibold">AVVIA IL PROGETTO</span>
+                  <div className="flex items-center gap-3 border border-white/20 px-8 py-4 backdrop-blur-md bg-white/5 hover:bg-white/10 hover:border-white/40 transition-all text-white group rounded-full">
+                    <Play size={14} className="fill-white group-hover:text-white transition-colors" />
+                    <span className="text-sm tracking-widest font-semibold uppercase">AVVIA IL PROGETTO</span>
                   </div>
                 </MagneticButton>
-                <div className="self-start lg:self-end flex flex-wrap items-stretch gap-2 sm:gap-3 text-sm text-white/80">
-                  <div className="bg-[#5e17eb]/20 backdrop-blur-sm px-4 py-2 border border-[#8c52ff]/20 text-[#8c52ff]">
-                    <span className="font-bold text-sm tracking-widest">NEXT.JS EXPERTS</span>
-                  </div>
-                  <div className="bg-[#5e17eb]/20 backdrop-blur-sm px-4 py-2 border border-[#8c52ff]/20 text-[#8c52ff]">
-                    <span className="font-bold text-sm tracking-widest">AI NATIVE</span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -291,7 +203,7 @@ export default function Home() {
               <GlowCard className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-3xl border border-white/20 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
                 <div className="flex justify-between items-start">
                   <div className="border border-[#8c52ff]/50 text-[#8c52ff] px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono bg-[#8c52ff]/10 font-semibold">
-                    01 / Artificial Intelligence
+                    ARTIFICIAL INTELLIGENCE
                   </div>
                   {/* LOGO VOLTA STUDIO ANIMATO */}
                   <div className="absolute top-4 right-4 z-20 pointer-events-auto scale-75 origin-top-right">
@@ -310,7 +222,7 @@ export default function Home() {
               <GlowCard className="col-span-1 md:col-span-1 lg:col-span-2 row-span-1 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-3xl border border-white/20 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
                 <div className="flex justify-between items-start">
                   <div className="border border-white/40 group-hover:border-[#8c52ff]/60 group-hover:text-[#8c52ff] px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono transition-colors font-semibold">
-                    02 / Web Engineering
+                    WEB ENGINEERING
                   </div>
                 </div>
                 <div>
@@ -323,7 +235,7 @@ export default function Home() {
               <GlowCard className="col-span-1 md:col-span-3 lg:col-span-2 row-span-1 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-3xl border border-white/20 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
                 <div className="flex justify-between items-start">
                   <div className="border border-white/40 group-hover:border-[#8c52ff]/60 group-hover:text-[#8c52ff] px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono transition-colors font-semibold">
-                    03 / Pixel Perfect Design
+                    PIXEL PERFECT DESIGN
                   </div>
                 </div>
                 <div>
@@ -366,9 +278,7 @@ export default function Home() {
         {/* 4. REACTBITS COMPONENT SECTION */}
         <section className="bg-black flex flex-col items-center justify-center px-6 py-48 border-t border-white/5">
           <div className="max-w-4xl w-full text-center space-y-16">
-            <div className="inline-block border border-white/20 px-6 py-2 rounded-full text-sm text-white/60 tracking-widest uppercase bg-white/5">
-              Intersection Observer
-            </div>
+
             
             <h2 className="text-4xl md:text-6xl font-light tracking-wide leading-tight">
               Il software non deve solo funzionare, <span className="text-[#8c52ff]">deve lasciare il segno.</span>
