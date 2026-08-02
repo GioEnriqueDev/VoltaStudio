@@ -1,64 +1,106 @@
 "use client";
 import React, { useRef, useState } from "react";
+import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from "framer-motion";
 
 export function GlowCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Motion values for physical 3D tilt (Framer Motion)
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  // Smooth spring physics for organic movement
+  const springConfig = { damping: 30, stiffness: 200, mass: 0.5 };
+  const smoothX = useSpring(mouseX, springConfig);
+  const smoothY = useSpring(mouseY, springConfig);
+
+  // Tilt constraints (max 6 degrees for a premium, heavy glass feel)
+  const rotateX = useTransform(smoothY, [-0.5, 0.5], [6, -6]);
+  const rotateY = useTransform(smoothX, [-0.5, 0.5], [-6, 6]);
+
+  // Glow position for the spotlight effect
+  const glowX = useSpring(useMotionValue(50), { stiffness: 300, damping: 40 });
+  const glowY = useSpring(useMotionValue(50), { stiffness: 300, damping: 40 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    setMousePosition({ x, y });
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    
+    // Normalize coordinates for 3D tilt (-0.5 to 0.5)
+    const xPct = (e.clientX - rect.left) / rect.width - 0.5;
+    const yPct = (e.clientY - rect.top) / rect.height - 0.5;
+    
+    mouseX.set(xPct);
+    mouseY.set(yPct);
+
+    // Percentage coordinates for spotlight (0 to 100)
+    glowX.set(((e.clientX - rect.left) / rect.width) * 100);
+    glowY.set(((e.clientY - rect.top) / rect.height) * 100);
   };
 
-  return (
-    <div
-      ref={cardRef}
-      className={`relative overflow-hidden group ${className}`}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
-      style={{
-        transformStyle: "preserve-3d",
-        transform: isHovering 
-          ? `perspective(1000px) rotateX(${(mousePosition.y - (cardRef.current?.clientHeight || 0)/2) / -25}deg) rotateY(${(mousePosition.x - (cardRef.current?.clientWidth || 0)/2) / 25}deg)`
-          : "perspective(1000px) rotateX(0deg) rotateY(0deg)",
-        transition: isHovering ? "transform 0.1s ease-out" : "transform 0.5s ease-out"
-      }}
-    >
-      {/* 1. StarBorder (Reactbits Pattern) - Rotating gradient border */}
-      <div className="absolute inset-0 z-0 p-[2px] rounded-3xl overflow-hidden pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity duration-500">
-        <div className="w-[300%] h-[300%] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[conic-gradient(from_0deg,transparent_0_340deg,#8c52ff_360deg)] animate-[spin_4s_linear_infinite]" />
-      </div>
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    mouseX.set(0);
+    mouseY.set(0);
+    glowX.set(50);
+    glowY.set(50);
+  };
 
-      {/* 2. Background Glow Tracking */}
-      <div
-        className="pointer-events-none absolute inset-[2px] rounded-3xl z-0 transition-opacity duration-500 bg-[#05050A]"
+  // Dinamic spotlight gradient template (Illuminazione diffusa)
+  const background = useMotionTemplate`radial-gradient(800px circle at ${glowX}% ${glowY}%, rgba(255, 255, 255, 0.6), transparent 40%)`;
+
+  // Glare fisico (riflesso speculare come sul vetro Apple/Linear)
+  // Usa il tilt per spostare il riflesso sulla diagonale
+  const glareX = useTransform(mouseX, [-0.5, 0.5], [150, -50]);
+  const glareY = useTransform(mouseY, [-0.5, 0.5], [150, -50]);
+  const glareBackground = useMotionTemplate`linear-gradient(105deg, transparent 10%, rgba(255,255,255,0.8) ${glareX}%, transparent 90%)`;
+
+  // Pulizia stili hardcoded
+  const cleanClassName = className.replace(/bg-\S+/g, '').replace(/shadow-\S+/g, '');
+
+  return (
+    <motion.div
+      ref={ref}
+      className={`relative overflow-hidden group rounded-[2.5rem] bg-white/50 backdrop-blur-[60px] backdrop-saturate-[180%] border border-black/5 shadow-[0_15px_35px_rgba(0,0,0,0.03)] ${cleanClassName}`}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX,
+        rotateY,
+        transformPerspective: 1200,
+        transformStyle: "preserve-3d"
+      }}
+      whileHover={{ scale: 1.01 }}
+      transition={{ duration: 0.2 }}
+    >
+      {/* 1. Base Vetro Smerigliato */}
+      <div className="absolute inset-0 rounded-[2.5rem] z-0 bg-white/30" />
+
+      {/* 2. Illuminazione Diffusa (Spotlight che segue il cursore) */}
+      <motion.div
+        className="pointer-events-none absolute inset-0 z-10 rounded-[2.5rem] transition-opacity duration-500"
         style={{
-          background: isHovering 
-            ? `radial-gradient(800px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(140,82,255,0.15), #05050A 40%)`
-            : "#05050A"
+          opacity: isHovered ? 1 : 0,
+          background,
+          boxShadow: "inset 0 1px 1px rgba(255,255,255,0.8), inset 0 0 0 1px rgba(0,0,0,0.02)"
         }}
       />
-      
-      {/* 3. Border Glow Tracking (Inner Shadow Mask) */}
-      <div
-        className="pointer-events-none absolute inset-0 z-10 transition-opacity duration-500 rounded-3xl"
-        style={{
-          opacity: isHovering ? 1 : 0,
-          boxShadow: `inset 0 0 0 1px rgba(255,255,255,0.05)`,
-          maskImage: `radial-gradient(300px circle at ${mousePosition.x}px ${mousePosition.y}px, black, transparent)`
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-[#8c52ff] to-[#5e17eb] opacity-80 mix-blend-overlay" />
-      </div>
 
-      <div className="relative z-20 h-full w-full">
+      {/* 3. Glare Fisico (Riflesso di luce diagonale) */}
+      <motion.div
+        className="pointer-events-none absolute inset-0 z-10 rounded-[2.5rem] transition-opacity duration-300 mix-blend-overlay"
+        style={{
+          opacity: isHovered ? 1 : 0,
+          background: glareBackground,
+        }}
+      />
+
+      {/* Content */}
+      <div className="relative z-20 h-full w-full" style={{ transform: "translateZ(20px)" }}>
         {children}
       </div>
-    </div>
+    </motion.div>
   );
 }

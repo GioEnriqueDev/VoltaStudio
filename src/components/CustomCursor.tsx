@@ -10,9 +10,9 @@ export default function CustomCursor() {
     const cursor = cursorRef.current;
     if (!cursor) return;
 
-    // Use GSAP quickTo for zero-latency, 120Hz performance
-    const xTo = gsap.quickTo(cursor, "x", { duration: 0.1, ease: "power3" });
-    const yTo = gsap.quickTo(cursor, "y", { duration: 0.1, ease: "power3" });
+    // Movimento ultra-fluido con inerzia
+    const xTo = gsap.quickTo(cursor, "x", { duration: 0.15, ease: "power3.out" });
+    const yTo = gsap.quickTo(cursor, "y", { duration: 0.15, ease: "power3.out" });
 
     const moveCursor = (e: MouseEvent) => {
       xTo(e.clientX);
@@ -22,6 +22,7 @@ export default function CustomCursor() {
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (
+        window.getComputedStyle(target).cursor === "pointer" ||
         target.tagName.toLowerCase() === "a" ||
         target.tagName.toLowerCase() === "button" ||
         target.closest("a") ||
@@ -46,18 +47,20 @@ export default function CustomCursor() {
     <>
       <div
         ref={cursorRef}
-        className="fixed top-0 left-0 rounded-full bg-white mix-blend-difference pointer-events-none z-[9999] transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center transition-[width,height,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        className="fixed top-0 left-0 rounded-full pointer-events-none z-[9999] transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
         style={{
-          width: isHovering ? "60px" : "12px",
-          height: isHovering ? "60px" : "12px",
-          opacity: 1,
+          width: isHovering ? "72px" : "14px",
+          height: isHovering ? "72px" : "14px",
+          backgroundColor: "white",
+          mixBlendMode: "difference",
+          // L'effetto difference su bianco crea un cerchio nero su fondo grigio/bianco,
+          // ma si trasforma "magicamente" invertendo i colori quando passi sui testi o bottoni scuri.
         }}
-      >
-        {isHovering && (
-          <span className="text-[10px] font-bold text-black tracking-widest uppercase opacity-100">Click</span>
-        )}
-      </div>
-      <style dangerouslySetInnerHTML={{ __html: `body { cursor: none; }` }} />
+      />
+      <style dangerouslySetInnerHTML={{ __html: `
+        body { cursor: none !important; } 
+        a, button, [role="button"], input, select, textarea { cursor: none !important; }
+      ` }} />
     </>
   );
 }

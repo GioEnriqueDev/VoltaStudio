@@ -3,7 +3,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Play, Menu, X, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import gsap from "gsap";
-import Lightfall from "../components/Lightfall";
+import Lenis from "lenis";
+import Waves from "../components/Waves";
 import DecryptedText from "../components/DecryptedText";
 import Logo from "../components/Logo";
 import { GlowCard } from "../components/GlowCard";
@@ -23,6 +24,25 @@ export default function Home() {
 
     import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
       gsap.registerPlugin(ScrollTrigger);
+
+      // Initialize Lenis Smooth Scroll
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: 'vertical',
+        gestureOrientation: 'vertical',
+        smoothWheel: true,
+        wheelMultiplier: 1,
+        touchMultiplier: 2,
+      });
+
+      lenis.on('scroll', ScrollTrigger.update);
+
+      gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+      });
+
+      gsap.ticker.lagSmoothing(0);
 
       let mm = gsap.matchMedia();
       
@@ -64,146 +84,121 @@ export default function Home() {
           );
         }
 
-        // --- KINETIC TYPOGRAPHY (Split-Type Reveal) ---
-        const titleElement = document.querySelector(".split-reveal");
-        if (titleElement) {
-          const text = new SplitType(titleElement as HTMLElement, { types: "chars" });
+        // --- KINETIC TYPOGRAPHY (Line Reveal) ---
+        const titleLines = document.querySelectorAll(".hero-title-line");
+        if (titleLines.length > 0) {
           gsap.fromTo(
-            text.chars,
-            { opacity: 0, y: 100, rotateX: -90 },
+            titleLines,
+            { opacity: 0, y: 80, rotateX: -45 },
             {
               opacity: 1,
               y: 0,
               rotateX: 0,
-              duration: 1.2,
-              stagger: 0.02,
+              duration: 1.4,
+              stagger: 0.15,
               ease: "power4.out",
-              delay: 0.5,
+              delay: 0.3,
             }
           );
         }
 
-        // --- VELOCITY SKEW (Inerzia Fisica con ScrollTrigger) ---
-        let proxy = { skew: 0 };
-        const skewSetter = gsap.quickSetter(".skew-element", "skewY", "deg");
-        const clamp = gsap.utils.clamp(-5, 5); // Max 5 gradi per eleganza
-        
-        ScrollTrigger.create({
-          onUpdate: (self) => {
-            let skew = clamp(self.getVelocity() / -100);
-            if (Math.abs(skew) > Math.abs(proxy.skew)) {
-              proxy.skew = skew;
-              gsap.to(proxy, {
-                skew: 0, 
-                duration: 1.2, // Ritorno morbido come gelatina
-                ease: "elastic.out(1, 0.3)", 
-                overwrite: true, 
-                onUpdate: () => skewSetter(proxy.skew)
-              });
-            }
-          }
-        });
+        // --- RIMOSSO VELOCITY SKEW ---
+        // L'inerzia di scroll GSAP (skewY) interferiva direttamente con i transform 3D 
+        // di Framer Motion (rotateX, rotateY) sulla stessa proprietà CSS, rompendo 
+        // la fisica del vetro durante lo scroll.
       });
       // ---------------------------------------------------------
       
     });
   }, []);
 
-  const navLinks = ["CHI SIAMO", "METODO", "PROGETTI", "SERVIZI", "AI LAB", "CONTATTI"];
+  const navLinks = ["SERVIZI", "APPROCCIO", "CASE STUDY", "CONTATTI"];
 
   return (
-    <main className="relative w-full bg-black text-white selection:bg-[#8c52ff] selection:text-white">
+    <main className="relative w-full bg-[#E8E8EB] text-[#0a0a0a] selection:bg-[#8E2DE2] selection:text-white">
       
-      {/* LIGHTFALL BACKGROUND (Cinematic Space Tunnel) */}
-      <div className="fixed inset-0 z-0 pointer-events-auto bg-black overflow-hidden">
-        <Lightfall
-          colors={['#ffffff', '#8c52ff', '#5e17eb']}
-          backgroundColor="#050505"
-          speed={0.8}
-          streakCount={10}
-          streakWidth={1.5}
-          streakLength={1.2}
-          glow={1.2}
-          density={0.8}
-          twinkle={1.5}
-          zoom={3}
-          backgroundGlow={0.6}
-          opacity={1}
-          mouseInteraction={true}
-          mouseStrength={1.5}
-          mouseRadius={1}
-          mixBlendMode="screen"
+      {/* WAVES BACKGROUND (Minimal, Interactive, WOW) */}
+      <div className="fixed inset-0 z-0 pointer-events-auto bg-[#E8E8EB] overflow-hidden">
+        <Waves
+          lineColor="rgba(0, 0, 0, 0.05)" // Onde sottili scure per il light theme
+          backgroundColor="transparent"
+          waveSpeedX={0.045} 
+          waveSpeedY={0.025} 
+          waveAmpX={60} 
+          waveAmpY={30} 
+          friction={0.88} 
+          tension={0.02} 
+          maxCursorMove={180} 
+          xGap={16}
+          yGap={40}
         />
-        {/* Gradiente nero sul fondo per sfumare dolcemente verso il basso ed enfatizzare il contrasto */}
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-black/20 to-[#050505] opacity-90" />
+        
+        {/* Sfumatura chiara a sinistra per leggibilità */}
+        <div className="absolute inset-y-0 left-0 w-full md:w-[60%] lg:w-[50%] bg-gradient-to-r from-[#E8E8EB] via-[#E8E8EB]/90 to-transparent pointer-events-none z-0" />
       </div>
+
+      {/* CUSTOM CIRCULAR CURSOR ELEMENT (Center-Right) */}
+      <div className="fixed top-1/2 right-[15%] -translate-y-1/2 w-[35rem] h-[35rem] bg-black/5 rounded-full blur-[100px] pointer-events-none z-0" />
 
       {/* HERO FOREGROUND TEXT (Fisso, sfuma via con lo scroll) */}
       <div className="fixed inset-0 z-10 pointer-events-none">
         <div ref={heroTextRef} className="flex h-full flex-col px-5 sm:px-6 md:px-10 lg:px-14">
           
-          {/* FLOATING NAVBAR PILL */}
-          <div className="w-full max-w-6xl mx-auto pt-6 pointer-events-auto">
-            <header className="flex items-center justify-between px-6 py-3 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl">
-              <Logo />
-              <nav className="hidden lg:flex gap-8 text-sm tracking-wide text-white/70">
-                {navLinks.slice(0, -1).map((link) => (
-                  <Link key={link} href="#" className="hover:text-white transition-colors uppercase font-medium">
+          {/* TOP NAVBAR (Wide, Minimal) */}
+          <div className="w-full max-w-[1600px] mx-auto pt-8 pointer-events-auto">
+            <header className="relative flex items-center justify-between py-4">
+              <div className="flex-1 -ml-6 sm:-ml-8 md:-ml-12 lg:-ml-[64px] xl:-ml-[72px]">
+                <Logo />
+              </div>
+              <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 gap-10 text-[13px] tracking-wide text-black/60">
+                {navLinks.map((link, i) => (
+                  <Link key={i} href="#" className="relative group hover:text-black transition-colors font-semibold">
                     {link}
+                    {/* Micro-interaction indicator */}
+                    <span className="absolute -bottom-1.5 left-1/2 w-1 h-1 bg-black rounded-full opacity-0 group-hover:opacity-100 -translate-x-1/2 transition-all" />
                   </Link>
                 ))}
               </nav>
-              <div className="flex items-center gap-4">
-                <button className="hidden lg:flex px-6 py-2 bg-white text-black text-sm font-semibold rounded-full hover:bg-white/90 transition-colors">
-                  CONTATTI
+              <div className="flex-1 flex justify-end items-center gap-4">
+                <button className="hidden lg:flex px-6 py-2.5 bg-[#0a0a0a] text-white rounded-md text-[13px] font-semibold tracking-wide shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_25px_rgba(0,0,0,0.15)] hover:scale-[1.02] transition-all duration-300">
+                  INIZIA ORA
                 </button>
-                <button className="lg:hidden p-2 text-white/70 hover:text-white transition-colors" onClick={() => setMenuOpen(true)}>
+                <button className="lg:hidden p-2 text-black/70 hover:text-black transition-colors" onClick={() => setMenuOpen(true)}>
                   <Menu size={24} />
                 </button>
               </div>
             </header>
           </div>
 
-          <div className="flex-1 flex flex-col items-center justify-center text-center pb-20 pointer-events-none">
+          {/* HERO CONTENT (Rockstar Typography + Left Aligned for Background Showcase) */}
+          <div className="flex-1 w-full max-w-[1600px] mx-auto flex flex-col justify-center items-start px-2 md:px-8 pb-10 pointer-events-none z-10">
             
-            {/* BADGE */}
-            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm text-sm mb-8">
-              <span className="bg-white text-black px-2.5 py-0.5 rounded-full font-bold text-[10px] uppercase tracking-wider">
-                AGENCY
-              </span>
-              <span className="text-white/80 font-medium">L'agenzia AI più avanzata d'Italia</span>
-            </div>
-
-            {/* TITLE */}
-            <h1 className="split-reveal text-5xl sm:text-6xl md:text-7xl lg:text-[6.5rem] tracking-tighter font-semibold overflow-hidden leading-[1.02] max-w-5xl mt-4 text-white" style={{ perspective: "1000px" }}>
-              <div className="block pb-2">
-                Ingegneria digitale.
-              </div>
-              <div className="block text-white/90">
-                Risultati estremi.
-              </div>
+            {/* MASSIVE TITLES */}
+            <h1 className="text-left text-[4rem] sm:text-[6.5rem] md:text-[8rem] lg:text-[10rem] tracking-tighter font-black overflow-visible leading-[0.85] uppercase">
+              <span className="hero-title-line block text-[#0a0a0a]">INNOVAZIONE.</span>
+              {/* Parola trasparente con bordo per mostrare il background che scorre sotto */}
+              <span className="hero-title-line block text-transparent" style={{ WebkitTextStroke: "2px #0a0a0a" }}>AUTOMAZIONE.</span>
+              <span className="hero-title-line block text-[#0a0a0a]">RISULTATI.</span>
             </h1>
 
             {/* DESCRIPTION */}
-            <p className="text-[#a1a1a6] max-w-2xl text-lg md:text-xl leading-relaxed font-medium mt-6 tracking-tight">
-              Sviluppo software full-stack, AI agents e performance marketing per scalare il tuo business oltre ogni limite tecnico.
+            <p className="hero-title-line text-[#555555] max-w-lg text-[18px] md:text-[20px] leading-[1.5] font-medium mt-10">
+              Soluzioni digitali avanzate per aziende che vogliono dominare il 2028.
             </p>
-
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center gap-4 mt-10 pointer-events-auto">
-              <MagneticButton>
-                <div className="flex items-center justify-center gap-3 px-8 py-4 bg-white text-black hover:bg-white/90 transition-all rounded-full group cursor-pointer w-full sm:w-auto">
-                  <span className="text-sm tracking-widest font-bold uppercase">Inizia Ora</span>
-                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                </div>
-              </MagneticButton>
-              <MagneticButton>
-                <div className="flex items-center justify-center gap-3 border border-white/20 px-8 py-4 backdrop-blur-md bg-white/5 hover:bg-white/10 transition-all text-white rounded-full cursor-pointer w-full sm:w-auto">
-                  <span className="text-sm tracking-widest font-semibold uppercase">Scopri il metodo</span>
-                </div>
-              </MagneticButton>
+          </div>
+          
+          {/* HERO FOOTER (GTA VI Style Layout - Bilanciato a sinistra) */}
+          <div className="w-full max-w-[1600px] mx-auto pb-12 flex flex-col md:flex-row justify-between items-start md:items-center px-4 md:px-8 pointer-events-auto z-10">
+            <button className="px-10 py-4 bg-[#0a0a0a] text-white rounded-full text-[15px] font-bold tracking-widest shadow-[0_15px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.2)] hover:scale-[1.03] transition-all duration-300 mb-8 md:mb-0">
+              INIZIA ORA
+            </button>
+            
+            <div className="flex flex-col md:items-end">
+              <p className="text-[#0a0a0a] font-black text-lg md:text-xl uppercase tracking-widest leading-tight md:text-right">
+                IN ARRIVO<br/>
+                LE SOLUZIONI DEL 2028
+              </p>
             </div>
-
           </div>
         </div>
       </div>
@@ -222,57 +217,57 @@ export default function Home() {
         <section className="relative py-24 px-6 md:px-14">
           <div className="relative z-10 max-w-[1400px] mx-auto">
             <div className="mb-24 flex flex-col items-center text-center">
-              <h2 className="text-4xl md:text-5xl lg:text-6xl tracking-tight max-w-4xl leading-tight font-medium text-white/90">
-                L'eccellenza non si raggiunge con i template.<br/><br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50">
-                  Sviluppiamo codice per risultati impossibili da replicare.
+              <h2 className="text-4xl md:text-5xl lg:text-6xl tracking-tight max-w-4xl leading-tight font-medium text-[#0a0a0a]/90">
+                Il design mediocre ti costa clienti.<br/><br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#0a0a0a] to-[#0a0a0a]/50">
+                  Costruiamo esperienze premium che convertono e posizionano il tuo brand al vertice.
                 </span>
               </h2>
             </div>
 
             <div ref={bentoGridRef} className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 auto-rows-[350px]">
               {/* Bento Box 1: AI */}
-              <GlowCard className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-xl border border-white/10 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
+              <GlowCard className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 bg-white/50 hover:bg-white/70 transition-all duration-500 backdrop-blur-[60px] backdrop-saturate-[180%] border border-black/5 rounded-[2.5rem] p-10 flex flex-col justify-between shadow-[0_20px_40px_rgba(0,0,0,0.05)]">
                 <div className="flex justify-between items-start">
-                  <div className="border border-white/10 text-white/70 px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono bg-white/5 font-semibold">
-                    ARTIFICIAL INTELLIGENCE
+                  <div className="border border-black/10 text-[#0a0a0a]/80 px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono bg-white/40 font-semibold shadow-sm">
+                    AUTOMAZIONE & AI
                   </div>
                   {/* LOGO VOLTA STUDIO ANIMATO */}
-                  <div className="absolute top-4 right-4 z-20 pointer-events-auto scale-75 origin-top-right opacity-50">
+                  <div className="absolute top-4 right-4 z-20 pointer-events-auto scale-75 origin-top-right opacity-80 mix-blend-multiply">
                     <Logo />
                   </div>
                 </div>
                 <div className="relative z-10">
-                  <h3 className="text-4xl lg:text-6xl tracking-tighter mb-4 text-white font-medium">Integrazione LLM<br/>& Agenti</h3>
-                  <p className="text-[#a1a1a6] text-lg max-w-md font-medium leading-relaxed">
-                    Sviluppiamo soluzioni AI proprietarie, da agenti conversazionali a sistemi RAG avanzati integrati direttamente nella tua infrastruttura aziendale.
+                  <h3 className="text-4xl lg:text-6xl tracking-tighter mb-4 text-[#0a0a0a] font-medium">Lavora meno,<br/>produci di più.</h3>
+                  <p className="text-[#4a4a4a] text-lg max-w-md font-medium leading-relaxed">
+                    Tagliamo i costi operativi e annulliamo l'errore umano integrando agenti intelligenti che gestiscono il lavoro ripetitivo al posto tuo, 24/7.
                   </p>
                 </div>
               </GlowCard>
 
               {/* Bento Box 2: Engineering */}
-              <GlowCard className="col-span-1 md:col-span-1 lg:col-span-2 row-span-1 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-xl border border-white/10 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
+              <GlowCard className="col-span-1 md:col-span-1 lg:col-span-2 row-span-1 bg-white/50 hover:bg-white/70 transition-all duration-500 backdrop-blur-[60px] backdrop-saturate-[180%] border border-black/5 rounded-[2.5rem] p-10 flex flex-col justify-between shadow-[0_20px_40px_rgba(0,0,0,0.05)]">
                 <div className="flex justify-between items-start">
-                  <div className="border border-white/10 group-hover:border-white/30 text-white/70 group-hover:text-white px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono transition-colors font-semibold">
-                    WEB ENGINEERING
+                  <div className="border border-black/10 group-hover:border-black/20 text-[#0a0a0a]/80 group-hover:text-black px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono transition-colors font-semibold shadow-sm">
+                    TECNOLOGIA HIGH-END
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-3xl lg:text-4xl tracking-tight mb-2 text-white font-medium">Performance Assolute</h3>
-                  <p className="text-[#a1a1a6] text-base font-medium leading-relaxed">Architetture Next.js server-first, Edge computing e ottimizzazione Core Web Vitals al millisecondo.</p>
+                  <h3 className="text-3xl lg:text-4xl tracking-tight mb-2 text-[#0a0a0a] font-medium">Infrastrutture Infallibili</h3>
+                  <p className="text-[#4a4a4a] text-base font-medium leading-relaxed">Piattaforme web e app ultra-veloci che non si bloccano mai, progettate per gestire picchi di traffico e trasmettere la massima affidabilità ai tuoi clienti.</p>
                 </div>
               </GlowCard>
 
               {/* Bento Box 3: Design */}
-              <GlowCard className="col-span-1 md:col-span-3 lg:col-span-2 row-span-1 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-xl border border-white/10 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
+              <GlowCard className="col-span-1 md:col-span-3 lg:col-span-2 row-span-1 bg-white/50 hover:bg-white/70 transition-all duration-500 backdrop-blur-[60px] backdrop-saturate-[180%] border border-black/5 rounded-[2.5rem] p-10 flex flex-col justify-between shadow-[0_20px_40px_rgba(0,0,0,0.05)]">
                 <div className="flex justify-between items-start">
-                  <div className="border border-white/10 group-hover:border-white/30 text-white/70 group-hover:text-white px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono transition-colors font-semibold">
-                    PIXEL PERFECT DESIGN
+                  <div className="border border-black/10 group-hover:border-black/20 text-[#0a0a0a]/80 group-hover:text-black px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono transition-colors font-semibold shadow-sm">
+                    DESIGN PERSUASIVO
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-3xl lg:text-4xl tracking-tight mb-2 text-white font-medium">Estetica & Funzione</h3>
-                  <p className="text-[#a1a1a6] text-base font-medium leading-relaxed">Nessuna scorciatoia. Disegniamo interfacce customizzate che fondono le migliori pratiche UX con layout ultra-premium.</p>
+                  <h3 className="text-3xl lg:text-4xl tracking-tight mb-2 text-[#0a0a0a] font-medium">Vendita Silenziosa</h3>
+                  <p className="text-[#4a4a4a] text-base font-medium leading-relaxed">Non facciamo solo siti belli. Studiamo la psicologia del tuo utente per trasformare ogni singola visita in una conversazione commerciale ad alto valore.</p>
                 </div>
               </GlowCard>
             </div>
@@ -283,24 +278,24 @@ export default function Home() {
         <section className="py-32 md:py-48 px-6 md:px-14">
           <div className="max-w-[1200px] mx-auto flex flex-col items-center">
             <h2 className="text-5xl md:text-7xl tracking-tighter leading-none mb-32 text-center font-medium">
-              LE NOSTRE<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50">COMPETENZE.</span>
+              IL TUO VANTAGGIO<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#0a0a0a] to-[#0a0a0a]/50">COMPETITIVO.</span>
             </h2>
 
             <div className="w-full max-w-4xl flex flex-col gap-6 pb-[20vh]">
               {[
-                { title: "Next.js & React", desc: "Sviluppo Frontend ultrarapido e ottimizzato per i Core Web Vitals di Google." },
-                { title: "SEO & Growth", desc: "Analisi dei dati, tracciamento avanzato e acquisizione clienti scalabile." },
-                { title: "Python & AI", desc: "Automazione aziendale, RAG, e machine learning integrato nel tuo software." },
-                { title: "UX/UI & WebGL", desc: "L'eccellenza visiva per abbattere la frequenza di rimbalzo e alzare il tasso di conversione." },
+                { title: "Ecosistemi Scalabili", desc: "Architetture solide come la roccia che crescono insieme al tuo fatturato, senza mai rallentare l'esperienza utente." },
+                { title: "Intelligenza Artificiale", desc: "Diamo un cervello al tuo business. Assistenti virtuali e analisi dati per operare ininterrottamente 24/7." },
+                { title: "Acquisizione Strategica", desc: "Posizionamento chirurgico sui motori di ricerca per farti trovare esclusivamente da chi è già pronto a comprare." },
+                { title: "Brand Positioning Premium", desc: "Esperienze visive mozzafiato che sbaragliano la concorrenza e giustificano prezzi (e margini) molto più alti." },
               ].map((tech, i) => (
                 <div 
                   key={i} 
-                  className="sticky skew-element transform-gpu flex items-center justify-between bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-10 w-full h-[22vh] min-h-[160px] shadow-2xl transition-all duration-500 hover:bg-white/10 hover:border-white/30 hover:scale-[1.02]"
+                  className="sticky flex items-center justify-between bg-white/50 backdrop-blur-[60px] backdrop-saturate-[180%] border border-black/5 rounded-[2.5rem] p-10 w-full h-[22vh] min-h-[160px] shadow-[0_20px_40px_rgba(0,0,0,0.05)] transition-all duration-500 hover:bg-white/70 hover:border-black/10 hover:scale-[1.02]"
                   style={{ top: `calc(15vh + ${i * 30}px)`, zIndex: i + 10 }}
                 >
-                  <h3 className="text-3xl md:text-5xl tracking-tight font-medium text-white transition-colors">{tech.title}</h3>
-                  <p className="text-[#a1a1a6] text-lg max-w-sm text-right leading-relaxed font-medium">{tech.desc}</p>
+                  <h3 className="text-3xl md:text-5xl tracking-tight font-medium text-[#0a0a0a] transition-colors">{tech.title}</h3>
+                  <p className="text-[#4a4a4a] text-lg max-w-sm text-right leading-relaxed font-medium">{tech.desc}</p>
                 </div>
               ))}
             </div>
@@ -310,13 +305,13 @@ export default function Home() {
         {/* 4. REACTBITS COMPONENT SECTION */}
         <section className="flex flex-col items-center justify-center px-6 py-32 md:py-48">
           <div className="max-w-4xl w-full text-center space-y-16">
-            <h2 className="text-3xl md:text-5xl font-medium tracking-tight leading-tight text-white/90">
+            <h2 className="text-3xl md:text-5xl font-medium tracking-tight leading-tight text-[#0a0a0a]/90">
               Il software non deve solo funzionare,<br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50">deve lasciare il segno.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-b from-[#0a0a0a] to-[#0a0a0a]/50">deve lasciare il segno.</span>
             </h2>
 
             <div className="py-24">
-              <div className="text-[#a1a1a6] font-medium tracking-widest text-lg md:text-xl">
+              <div className="text-[#555] font-medium tracking-widest text-lg md:text-xl">
                 <DecryptedText text="VOLTA RESEARCH" speed={60} />
               </div>
             </div>
@@ -325,28 +320,48 @@ export default function Home() {
         
       </div> {/* FINE CONTENUTO SCORREVOLE */}
 
-      {/* MOBILE FULLSCREEN MENU */}
+      {/* MOBILE SIDEBAR MENU (Apple Glassmorphism Lucid) */}
       <div 
-        className={`fixed inset-0 z-50 bg-[#0a0a0a] flex flex-col transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 z-[100] transition-opacity duration-500 ${menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
       >
-        <div className="flex items-center justify-between px-6 py-6">
-          <Logo />
-          <button className="p-2 hover:opacity-70" onClick={() => setMenuOpen(false)}>
-            <X size={24} />
-          </button>
-        </div>
-        <div className="flex flex-col items-center justify-center flex-1 gap-8">
-          {navLinks.map((link, i) => (
-            <Link 
-              key={link} 
-              href="#" 
-              onClick={() => setMenuOpen(false)}
-              className={`text-2xl md:text-4xl uppercase tracking-widest font-medium transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-[#8c52ff] ${menuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-              style={{ transitionDelay: menuOpen ? `${100 + i * 60}ms` : '0ms' }}
-            >
-              {link}
-            </Link>
-          ))}
+        {/* Sfondo Oscurante (Backdrop Overlay) */}
+        <div 
+          className="absolute inset-0 bg-black/5 backdrop-blur-[4px]" 
+          onClick={() => setMenuOpen(false)} 
+        />
+        
+        {/* Pannello Sidebar (Apple Glass) */}
+        <div 
+          className={`absolute top-0 right-0 w-[85%] sm:w-[400px] h-full bg-white/40 backdrop-blur-[80px] backdrop-saturate-[180%] border-l border-white/60 shadow-[-20px_0_40px_rgba(0,0,0,0.05)] flex flex-col transform transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        >
+          <div className="flex items-center justify-between px-8 py-8 border-b border-black/5">
+             <span className="text-black font-bold tracking-widest uppercase text-xs">Menu</span>
+             <button className="p-2 -mr-2 bg-black/5 hover:bg-black/10 rounded-full text-black transition-colors" onClick={() => setMenuOpen(false)}>
+               <X size={20} />
+             </button>
+          </div>
+          
+          <div className="flex flex-col flex-1 px-8 py-10 gap-6 overflow-y-auto">
+            {navLinks.map((link, i) => (
+              <Link 
+                key={link} 
+                href="#" 
+                onClick={() => setMenuOpen(false)}
+                className={`text-2xl md:text-3xl tracking-tight font-medium text-black/80 hover:text-black transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center group ${menuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}
+                style={{ transitionDelay: menuOpen ? `${100 + i * 80}ms` : '0ms' }}
+              >
+                {link}
+                <ArrowRight size={24} className="ml-4 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+              </Link>
+            ))}
+          </div>
+
+          {/* Footer Sidebar */}
+          <div className="p-8 border-t border-black/5">
+             <button className="w-full py-4 bg-[#0a0a0a] text-white rounded-xl text-sm font-semibold tracking-wide shadow-[0_10px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_25px_rgba(0,0,0,0.15)] hover:scale-[1.02] transition-all duration-300">
+               INIZIA ORA
+             </button>
+          </div>
         </div>
       </div>
     </main>

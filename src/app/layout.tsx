@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter_Tight } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "../components/SmoothScroll";
 import CustomCursor from "../components/CustomCursor";
 import FilmGrain from "../components/FilmGrain";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const interTight = Inter_Tight({ 
+  subsets: ["latin"], 
+  variable: "--font-inter-tight",
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
 
 export const metadata: Metadata = {
   title: "Volta Studio | Agenzia Sviluppo Software, AI & Web Marketing",
@@ -24,7 +28,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://db.onlinewebfonts.com/c/d08bafd725a4cfc309efb5a88e0b63a5?family=basis33" rel="stylesheet" />
       </head>
-      <body className={`${inter.variable} font-sans`}>
+      <body className={`${interTight.variable} font-sans bg-[#E8E8EB]`}>
         <SmoothScroll>
           <FilmGrain />
           <CustomCursor />

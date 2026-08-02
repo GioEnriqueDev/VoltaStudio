@@ -17,3 +17,30 @@ body {
 .font-pixel {
   font-family: 'basis33', monospace;
 }
+
+@keyframes text-gradient {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.animate-text-gradient {
+  animation: text-gradient 4s linear infinite;
+}
+.animate-text-gradient-fast {
+  animation: text-gradient 2s linear infinite;
+}
+
+.text-liquid-dark {
+  background: linear-gradient(110deg, #0a0a0a 20%, #666666 40%, #0a0a0a 60%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.text-liquid-purple {
+  background: linear-gradient(110deg, #8E2DE2 20%, #c4a1ff 40%, #8E2DE2 60%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
