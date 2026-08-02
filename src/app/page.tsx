@@ -316,7 +316,9 @@ export default function Home() {
             </h2>
 
             <div className="py-24">
-              <DecryptedText text="VOLTA RESEARCH" speed={60} className="text-[#a1a1a6] font-medium tracking-widest text-lg md:text-xl" />
+              <div className="text-[#a1a1a6] font-medium tracking-widest text-lg md:text-xl">
+                <DecryptedText text="VOLTA RESEARCH" speed={60} />
+              </div>
             </div>
           </div>
         </section>
