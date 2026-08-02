@@ -117,7 +117,6 @@ export default function Home() {
       {/* FLOATING LINES BACKGROUND (Cinematic Dark+White) */}
       <div className="fixed inset-0 z-0 pointer-events-auto bg-[#050505] overflow-hidden">
         <FloatingLines
-          linesGradient={['#ffffff', '#8c52ff', '#333333']}
           enabledWaves={['top', 'middle', 'bottom']}
           lineCount={[10, 15, 20]}
           lineDistance={[8, 6, 4]}
@@ -128,49 +127,75 @@ export default function Home() {
           mixBlendMode="screen"
         />
         {/* Gradiente nero sul fondo per sfumare dolcemente verso il basso ed enfatizzare il contrasto */}
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black via-black/40 to-transparent opacity-90" />
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-black/20 to-[#050505] opacity-90" />
       </div>
 
       {/* HERO FOREGROUND TEXT (Fisso, sfuma via con lo scroll) */}
       <div className="fixed inset-0 z-10 pointer-events-none">
         <div ref={heroTextRef} className="flex h-full flex-col px-5 sm:px-6 md:px-10 lg:px-14">
-          <header className="flex items-center justify-between py-6 pointer-events-auto">
-            <Logo />
-            <nav className="hidden md:flex gap-8 text-sm tracking-wide">
-              {navLinks.map((link) => (
-                <Link key={link} href="#" className="hover:text-[#8c52ff] transition-colors uppercase font-medium">
-                  {link}
-                </Link>
-              ))}
-            </nav>
-            <button className="md:hidden p-2 hover:text-[#8c52ff] transition-colors" onClick={() => setMenuOpen(true)}>
-              <Menu size={24} />
-            </button>
-          </header>
-
-          {/* Top text block rimosso: il Logo in header è sufficiente per un look premium e pulito */}          <div className="flex-1" />
-
-          <div className="pb-10 lg:pb-24 pointer-events-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-end">
-              <div className="lg:col-span-8">
-                <h1 className="split-reveal text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] tracking-tight uppercase font-medium overflow-hidden leading-[1.05]" style={{ perspective: "1000px" }}>
-                  <div className="block">INGEGNERIA DIGITALE.</div>
-                  <div className="block mt-2 mb-2"><span className="font-pixel font-normal text-[1.1em] text-[#8c52ff]">MARKETING ESTREMO.</span></div>
-                  <div className="block">RISULTATI REALI.</div>
-                </h1>
+          
+          {/* FLOATING NAVBAR PILL */}
+          <div className="w-full max-w-6xl mx-auto pt-6 pointer-events-auto">
+            <header className="flex items-center justify-between px-6 py-3 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl">
+              <Logo />
+              <nav className="hidden lg:flex gap-8 text-sm tracking-wide text-white/70">
+                {navLinks.slice(0, -1).map((link) => (
+                  <Link key={link} href="#" className="hover:text-white transition-colors uppercase font-medium">
+                    {link}
+                  </Link>
+                ))}
+              </nav>
+              <div className="flex items-center gap-4">
+                <button className="hidden lg:flex px-6 py-2 bg-white text-black text-sm font-semibold rounded-full hover:bg-white/90 transition-colors">
+                  CONTATTI
+                </button>
+                <button className="lg:hidden p-2 text-white/70 hover:text-white transition-colors" onClick={() => setMenuOpen(true)}>
+                  <Menu size={24} />
+                </button>
               </div>
-              <div className="lg:col-span-4 flex flex-col gap-6 lg:pb-3">
-                <p className="text-white/70 max-w-sm text-sm md:text-base leading-relaxed font-light">
-                  Uniamo sviluppo software full-stack, AI e performance marketing per scalare il tuo business oltre ogni limite tecnico.
-                </p>
-                <MagneticButton className="self-start">
-                  <div className="flex items-center gap-3 border border-white/20 px-8 py-4 backdrop-blur-md bg-white/5 hover:bg-white/10 hover:border-white/40 transition-all text-white group rounded-full">
-                    <Play size={14} className="fill-white group-hover:text-white transition-colors" />
-                    <span className="text-sm tracking-widest font-semibold uppercase">AVVIA IL PROGETTO</span>
-                  </div>
-                </MagneticButton>
-              </div>
+            </header>
+          </div>
+
+          <div className="flex-1 flex flex-col items-center justify-center text-center pb-20 pointer-events-none">
+            
+            {/* BADGE */}
+            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm text-sm mb-8">
+              <span className="bg-white text-black px-2.5 py-0.5 rounded-full font-bold text-[10px] uppercase tracking-wider">
+                AGENCY
+              </span>
+              <span className="text-white/80 font-medium">L'agenzia AI più avanzata d'Italia</span>
             </div>
+
+            {/* TITLE */}
+            <h1 className="split-reveal text-5xl sm:text-6xl md:text-7xl lg:text-[6.5rem] tracking-tighter font-semibold overflow-hidden leading-[1.02] max-w-5xl mt-4 text-white" style={{ perspective: "1000px" }}>
+              <div className="block pb-2">
+                Ingegneria digitale.
+              </div>
+              <div className="block text-white/90">
+                Risultati estremi.
+              </div>
+            </h1>
+
+            {/* DESCRIPTION */}
+            <p className="text-[#a1a1a6] max-w-2xl text-lg md:text-xl leading-relaxed font-medium mt-6 tracking-tight">
+              Sviluppo software full-stack, AI agents e performance marketing per scalare il tuo business oltre ogni limite tecnico.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row items-center gap-4 mt-10 pointer-events-auto">
+              <MagneticButton>
+                <div className="flex items-center justify-center gap-3 px-8 py-4 bg-white text-black hover:bg-white/90 transition-all rounded-full group cursor-pointer w-full sm:w-auto">
+                  <span className="text-sm tracking-widest font-bold uppercase">Inizia Ora</span>
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </div>
+              </MagneticButton>
+              <MagneticButton>
+                <div className="flex items-center justify-center gap-3 border border-white/20 px-8 py-4 backdrop-blur-md bg-white/5 hover:bg-white/10 transition-all text-white rounded-full cursor-pointer w-full sm:w-auto">
+                  <span className="text-sm tracking-widest font-semibold uppercase">Scopri il metodo</span>
+                </div>
+              </MagneticButton>
+            </div>
+
           </div>
         </div>
       </div>
@@ -185,77 +210,76 @@ export default function Home() {
       {/* --- INIZIO CONTENUTO SCORREVOLE (Scorre sopra il canvas fisso!) --- */}
       <div className="relative z-20">
 
-        {/* BENTO GRID (Glassmorphism estremo + SVG Procedurale) */}
+        {/* BENTO GRID (Glassmorphism Elegante) */}
         <section className="relative py-24 px-6 md:px-14">
-          {/* Sfondo SVG animato procedurale */}
-          <AnimeGrid />
-          
           <div className="relative z-10 max-w-[1400px] mx-auto">
             <div className="mb-24 flex flex-col items-center text-center">
-              <h2 className="text-4xl md:text-6xl tracking-tight max-w-3xl leading-tight skew-element transform-gpu">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl tracking-tight max-w-4xl leading-tight font-medium text-white/90">
                 L'eccellenza non si raggiunge con i template.<br/><br/>
-                Scriviamo codice per risultati <span className="font-pixel text-5xl md:text-7xl text-[#8c52ff]">impossibili</span> da replicare.
+                <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50">
+                  Sviluppiamo codice per risultati impossibili da replicare.
+                </span>
               </h2>
             </div>
 
             <div ref={bentoGridRef} className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 auto-rows-[350px]">
               {/* Bento Box 1: AI */}
-              <GlowCard className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-3xl border border-white/20 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
+              <GlowCard className="col-span-1 md:col-span-2 lg:col-span-2 row-span-2 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-xl border border-white/10 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
                 <div className="flex justify-between items-start">
-                  <div className="border border-[#8c52ff]/50 text-[#8c52ff] px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono bg-[#8c52ff]/10 font-semibold">
+                  <div className="border border-white/10 text-white/70 px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono bg-white/5 font-semibold">
                     ARTIFICIAL INTELLIGENCE
                   </div>
                   {/* LOGO VOLTA STUDIO ANIMATO */}
-                  <div className="absolute top-4 right-4 z-20 pointer-events-auto scale-75 origin-top-right">
+                  <div className="absolute top-4 right-4 z-20 pointer-events-auto scale-75 origin-top-right opacity-50">
                     <Logo />
                   </div>
                 </div>
                 <div className="relative z-10">
-                  <h3 className="text-5xl lg:text-6xl tracking-tight mb-6 text-white drop-shadow-md">Integrazione LLM<br/>& Agenti</h3>
-                  <p className="text-white/90 text-xl max-w-md drop-shadow-sm font-medium">
+                  <h3 className="text-4xl lg:text-6xl tracking-tighter mb-4 text-white font-medium">Integrazione LLM<br/>& Agenti</h3>
+                  <p className="text-[#a1a1a6] text-lg max-w-md font-medium leading-relaxed">
                     Sviluppiamo soluzioni AI proprietarie, da agenti conversazionali a sistemi RAG avanzati integrati direttamente nella tua infrastruttura aziendale.
                   </p>
                 </div>
               </GlowCard>
 
               {/* Bento Box 2: Engineering */}
-              <GlowCard className="col-span-1 md:col-span-1 lg:col-span-2 row-span-1 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-3xl border border-white/20 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
+              <GlowCard className="col-span-1 md:col-span-1 lg:col-span-2 row-span-1 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-xl border border-white/10 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
                 <div className="flex justify-between items-start">
-                  <div className="border border-white/40 group-hover:border-[#8c52ff]/60 group-hover:text-[#8c52ff] px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono transition-colors font-semibold">
+                  <div className="border border-white/10 group-hover:border-white/30 text-white/70 group-hover:text-white px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono transition-colors font-semibold">
                     WEB ENGINEERING
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-3xl lg:text-4xl tracking-tight mb-3 text-white drop-shadow-md">Performance Assolute</h3>
-                  <p className="text-white/90 text-lg drop-shadow-sm font-medium">Architetture Next.js server-first, Edge computing e ottimizzazione Core Web Vitals al millisecondo.</p>
+                  <h3 className="text-3xl lg:text-4xl tracking-tight mb-2 text-white font-medium">Performance Assolute</h3>
+                  <p className="text-[#a1a1a6] text-base font-medium leading-relaxed">Architetture Next.js server-first, Edge computing e ottimizzazione Core Web Vitals al millisecondo.</p>
                 </div>
               </GlowCard>
 
               {/* Bento Box 3: Design */}
-              <GlowCard className="col-span-1 md:col-span-3 lg:col-span-2 row-span-1 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-3xl border border-white/20 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
+              <GlowCard className="col-span-1 md:col-span-3 lg:col-span-2 row-span-1 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-xl border border-white/10 rounded-3xl p-10 flex flex-col justify-between skew-element transform-gpu">
                 <div className="flex justify-between items-start">
-                  <div className="border border-white/40 group-hover:border-[#8c52ff]/60 group-hover:text-[#8c52ff] px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono transition-colors font-semibold">
+                  <div className="border border-white/10 group-hover:border-white/30 text-white/70 group-hover:text-white px-4 py-1.5 rounded-full text-xs tracking-widest uppercase font-mono transition-colors font-semibold">
                     PIXEL PERFECT DESIGN
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-3xl lg:text-4xl tracking-tight mb-3 font-pixel text-white drop-shadow-md">Estetica & Funzione</h3>
-                  <p className="text-white/90 text-lg drop-shadow-sm font-medium">Nessuna scorciatoia. Disegniamo interfacce customizzate che fondono le migliori pratiche UX con layout Awwwards-winning.</p>
+                  <h3 className="text-3xl lg:text-4xl tracking-tight mb-2 text-white font-medium">Estetica & Funzione</h3>
+                  <p className="text-[#a1a1a6] text-base font-medium leading-relaxed">Nessuna scorciatoia. Disegniamo interfacce customizzate che fondono le migliori pratiche UX con layout ultra-premium.</p>
                 </div>
               </GlowCard>
             </div>
           </div>
         </section>
 
-        {/* 3. STICKY STACK - TECH ARSENAL (Sostituisce Horizontal Pan) */}
-        <section className="py-48 px-6 md:px-14">
+        {/* 3. STICKY STACK - TECH ARSENAL */}
+        <section className="py-32 md:py-48 px-6 md:px-14">
           <div className="max-w-[1200px] mx-auto flex flex-col items-center">
-            <h2 className="text-6xl md:text-8xl tracking-tighter leading-none mb-32 text-center drop-shadow-xl">
+            <h2 className="text-5xl md:text-7xl tracking-tighter leading-none mb-32 text-center font-medium">
               LE NOSTRE<br />
-              <span className="font-pixel text-[1.2em] bg-clip-text text-transparent bg-gradient-to-br from-[#8c52ff] to-[#5e17eb]">ARMI.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50">COMPETENZE.</span>
             </h2>
 
-            <div className="w-full max-w-4xl flex flex-col gap-8 pb-[20vh]">
+            <div className="w-full max-w-4xl flex flex-col gap-6 pb-[20vh]">
               {[
                 { title: "Next.js & React", desc: "Sviluppo Frontend ultrarapido e ottimizzato per i Core Web Vitals di Google." },
                 { title: "SEO & Growth", desc: "Analisi dei dati, tracciamento avanzato e acquisizione clienti scalabile." },
@@ -264,11 +288,11 @@ export default function Home() {
               ].map((tech, i) => (
                 <div 
                   key={i} 
-                  className="sticky skew-element transform-gpu flex items-center justify-between bg-white/5 backdrop-blur-3xl border border-white/20 rounded-3xl p-12 w-full h-[25vh] shadow-[0_0_50px_rgba(140,82,255,0.1)] transition-all duration-500 hover:bg-white/10 hover:border-[#8c52ff]/50 hover:scale-[1.02]"
-                  style={{ top: `calc(15vh + ${i * 40}px)`, zIndex: i + 10 }}
+                  className="sticky skew-element transform-gpu flex items-center justify-between bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-10 w-full h-[22vh] min-h-[160px] shadow-2xl transition-all duration-500 hover:bg-white/10 hover:border-white/30 hover:scale-[1.02]"
+                  style={{ top: `calc(15vh + ${i * 30}px)`, zIndex: i + 10 }}
                 >
-                  <h3 className="text-4xl md:text-6xl tracking-tight font-medium text-white group-hover:text-[#8c52ff] transition-colors drop-shadow-md">{tech.title}</h3>
-                  <p className="text-white/90 text-xl max-w-sm text-right leading-relaxed drop-shadow-sm font-medium">{tech.desc}</p>
+                  <h3 className="text-3xl md:text-5xl tracking-tight font-medium text-white transition-colors">{tech.title}</h3>
+                  <p className="text-[#a1a1a6] text-lg max-w-sm text-right leading-relaxed font-medium">{tech.desc}</p>
                 </div>
               ))}
             </div>
@@ -276,16 +300,15 @@ export default function Home() {
         </section>
 
         {/* 4. REACTBITS COMPONENT SECTION */}
-        <section className="bg-black flex flex-col items-center justify-center px-6 py-48 border-t border-white/5">
+        <section className="flex flex-col items-center justify-center px-6 py-32 md:py-48">
           <div className="max-w-4xl w-full text-center space-y-16">
-
-            
-            <h2 className="text-4xl md:text-6xl font-light tracking-wide leading-tight">
-              Il software non deve solo funzionare, <span className="text-[#8c52ff]">deve lasciare il segno.</span>
+            <h2 className="text-3xl md:text-5xl font-medium tracking-tight leading-tight text-white/90">
+              Il software non deve solo funzionare,<br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50">deve lasciare il segno.</span>
             </h2>
 
-            <div className="py-24 border-y border-white/10">
-              <DecryptedText text="VOLTA RESEARCH" speed={60} />
+            <div className="py-24">
+              <DecryptedText text="VOLTA RESEARCH" speed={60} className="text-[#a1a1a6] font-medium tracking-widest text-lg md:text-xl" />
             </div>
           </div>
         </section>
