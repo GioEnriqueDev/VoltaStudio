@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Play, Menu, X, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import gsap from "gsap";
-import FloatingLines from "../components/FloatingLines";
+import Lightfall from "../components/Lightfall";
 import DecryptedText from "../components/DecryptedText";
 import Logo from "../components/Logo";
 import { GlowCard } from "../components/GlowCard";
@@ -114,16 +114,24 @@ export default function Home() {
   return (
     <main className="relative w-full bg-black text-white selection:bg-[#8c52ff] selection:text-white">
       
-      {/* FLOATING LINES BACKGROUND (Cinematic Dark+White) */}
-      <div className="fixed inset-0 z-0 pointer-events-auto bg-[#050505] overflow-hidden">
-        <FloatingLines
-          enabledWaves={['top', 'middle', 'bottom']}
-          lineCount={[10, 15, 20]}
-          lineDistance={[8, 6, 4]}
-          bendRadius={5.0}
-          bendStrength={-0.5}
-          interactive={true}
-          parallax={true}
+      {/* LIGHTFALL BACKGROUND (Cinematic Space Tunnel) */}
+      <div className="fixed inset-0 z-0 pointer-events-auto bg-black overflow-hidden">
+        <Lightfall
+          colors={['#ffffff', '#8c52ff', '#5e17eb']}
+          backgroundColor="#050505"
+          speed={0.8}
+          streakCount={10}
+          streakWidth={1.5}
+          streakLength={1.2}
+          glow={1.2}
+          density={0.8}
+          twinkle={1.5}
+          zoom={3}
+          backgroundGlow={0.6}
+          opacity={1}
+          mouseInteraction={true}
+          mouseStrength={1.5}
+          mouseRadius={1}
           mixBlendMode="screen"
         />
         {/* Gradiente nero sul fondo per sfumare dolcemente verso il basso ed enfatizzare il contrasto */}
